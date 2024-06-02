@@ -1,58 +1,73 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import font
-from PIL import Image, ImageTk
 
-# Переход с одного окна на другой
-def open_new_window():
-    win.withdraw()
 
-    new_window = Toplevel(win)
-    new_window.title("Карта")
-    new_window.attributes('-fullscreen', True)
+pack = False
 
-    new_window.iconphoto(False, duck)
+def button():
+    # Кнопка которая выполняет команду farther
+    btn_1 = ttk.Button(frame, text='Продолжить игру', command=farther)
+    btn_1.place(x= 1000, rely=0.25, height=100, width=500)
 
-    bg_logo_2 = ttk.Label(new_window, image=map_bg)
-    bg_logo_2.grid(row=0, column=0)
+    # Кнопка выхода
+    btn_2 = ttk.Button(frame, text= "Выход", command=lambda :win.destroy())
+    btn_2.place(x= 1000, rely=0.65, height=100, width=500)
 
-    def close_new_window():
-        new_window.destroy()
-        win.deiconify()
+    # Пустая кнопка(в будущем будет открываться другое окной)
+    btn_3 = ttk.Button(frame, text= "Пустая кнопка")
+    btn_3.place(x= 1000, rely=0.45, height=100, width=500)
 
-    button_back = ttk.Button(new_window, text="Вернуться назад", command=close_new_window)
-    button_back.place(x= 1000, rely=0.25, height=100, width=500)
+# Переход с frame на frame2
+def farther():
+    global pack
+    if pack:
+        frame2.pack_forget()
 
+        frame.pack()
+        frame.pack(fill=BOTH, expand=True)
+        bg_logo = Label(frame, image=win_bg)
+        bg_logo.grid(row=0, column=0)
+        button()
+        pack = False
+
+    else:
+        frame.pack_forget()
+
+        frame2.pack(fill=BOTH, expand=True)
+        map_logo = Label(frame2, image=map_bg)
+        map_logo.grid(row=0, column=0)
+        button2 = ttk.Button(frame2, text="Назад", command=farther)
+        button2.place(x=500, y=50)
+        pack = True
 
 win = Tk()
 
 win.title('Zuzu главный') # Name window
 win.attributes('-fullscreen', True) # fullscreen
 
+# Frame
+frame = Frame(win)
+frame.pack(fill=BOTH, expand=True)
+
+# frame2
+frame2 = Frame(win)
+frame2.pack(fill=BOTH, expand=True)
+
 # Icon
 duck = PhotoImage(file="duck.png")
 win.iconphoto(False,duck)
 
 # Image
-win.bg = PhotoImage(file="background_1.png")
+win_bg = PhotoImage(file="background_1.png")
 map_bg = PhotoImage(file="Map_1.png")
 
 # background
-bg_logo = Label(win, image=win.bg)
+bg_logo = Label(frame, image=win_bg)
 bg_logo.grid(row=0, column=0)
 
-# Кнопка перехода
-bth = ttk.Button(win, text='Продолжить игру', command=open_new_window)
-bth.place(x= 1000, rely=0.25, height=100, width=500)
-
-# Кнопка выхода
-bth_2 = ttk.Button(win, text= "Выход", command=lambda :win.destroy())
-bth_2.place(x= 1000, rely=0.65, height=100, width=500)
-
-# Пустая кнопка(в будущем будет открываться другое окной)
-bth_3 = ttk.Button(win, text= "Пустая кнопка")
-bth_3.place(x= 1000, rely=0.45, height=100, width=500)
-
+# Создание кнопок
+button()
 
 
 win.mainloop() # End
