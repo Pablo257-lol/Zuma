@@ -3,11 +3,12 @@ from tkinter import ttk
 from tkinter import font
 
 
-pack = False
+pack1 = False
+pack2 = False
 
 def button():
     # Кнопка которая выполняет команду farther
-    btn_1 = ttk.Button(frame, text='Продолжить игру', command=farther)
+    btn_1 = ttk.Button(frame, text='Продолжить игру', command=data)
     btn_1.place(x= 1000, rely=0.25, height=100, width=500)
 
     # Кнопка выхода
@@ -18,28 +19,51 @@ def button():
     btn_3 = ttk.Button(frame, text= "Пустая кнопка")
     btn_3.place(x= 1000, rely=0.45, height=100, width=500)
 
-# Переход с frame на frame2
-def farther():
-    global pack
-    if pack:
-        frame2.pack_forget()
+def data():
+    global pack1
+    if pack1:
+        frame1_2.pack_forget()
 
         frame.pack()
+        pack1 = False
+    else:
+        frame.pack_forget()
+
+        frame1_2.pack(fill=BOTH, expand=True)
+        win2_logo = Label(frame1_2, image=map_bg)
+        win2_logo.pack()
+        entry = Entry(frame1_2)
+        entry.place(relx=0.5, rely=0.5, anchor=CENTER)
+        btn1_1 = ttk.Button(frame1_2, text= "Продолжить", command=save_text)
+        btn1_1.place(x = 910, rely=0.52, height=25, width=100)
+        pack1 = True
+
+def save_text():
+    text = entry.get()
+    with open("text.txt", "w") as file:
+        file.write(text)
+    print(entry.get())
+
+# Переход с frame на frame2
+def farther():
+    global pack2
+    if pack2:
+        frame2.pack_forget()
+
         frame.pack(fill=BOTH, expand=True)
-        bg_logo = Label(frame, image=win_bg)
-        bg_logo.grid(row=0, column=0)
+        bg_logo.pack()
         button()
-        pack = False
+        pack2 = False
 
     else:
         frame.pack_forget()
 
         frame2.pack(fill=BOTH, expand=True)
         map_logo = Label(frame2, image=map_bg)
-        map_logo.grid(row=0, column=0)
+        map_logo.pack()
         button2 = ttk.Button(frame2, text="Назад", command=farther)
         button2.place(x=500, y=50)
-        pack = True
+        pack2 = True
 
 win = Tk()
 
@@ -48,6 +72,10 @@ win.attributes('-fullscreen', True) # fullscreen
 
 # Frame
 frame = Frame(win)
+frame.pack(fill=BOTH, expand=True)
+
+# frame 1.2
+frame1_2 = Frame(win)
 frame.pack(fill=BOTH, expand=True)
 
 # frame2
@@ -64,7 +92,10 @@ map_bg = PhotoImage(file="Map_1.png")
 
 # background
 bg_logo = Label(frame, image=win_bg)
-bg_logo.grid(row=0, column=0)
+bg_logo.pack()
+
+entry = Entry(frame1_2)
+entry.place(relx=0.5, rely=0.5, anchor=CENTER)
 
 # Создание кнопок
 button()
