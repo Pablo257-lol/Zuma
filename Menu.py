@@ -1,8 +1,9 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import font
+import Game
+import math
 import re
-
 
 data = "G:\Zuzu\pythonProject2\text.txt"
 pack1 = False
@@ -10,7 +11,7 @@ pack2 = False
 
 def button():
     # Кнопка которая выполняет команду farther
-    btn_1 = Button(frame, font=btn_font, text='Продолжить игру', command=data_frame)
+    btn_1 = Button(frame, font=btn_font, text='Начать игру', command=data_frame)
     btn_1.place(x= 1000, rely=0.25, height=100, width=500)
 
     # Кнопка выхода
@@ -20,13 +21,15 @@ def button():
     # Пустая кнопка(в будущем будет открываться другое окной)
     btn_3 = Button(frame, font=btn_font, text= "Результаты", command=lambda :farther(frame, frame3))
     btn_3.place(x= 1000, rely=0.45, height=100, width=500)
+    if pack1:
+        btn_1['text'] = 'Продолжить игру'
 
 # Переходит во frame1_2
 # (при повторном вызове, будет постоянно переходить во frame2)
 def data_frame():
     global pack1
     if pack1:
-        farther(frame, frame2)
+        frame.pack_forget()
     else:
         frame1_2.place(relx=0.5, rely=0.5, anchor="center")
         pack1 = True
@@ -40,7 +43,8 @@ def save_text():
             file.write(entry.get())
         file.close()
         frame1_2.place_forget()
-        farther(frame, frame2)
+        frame.pack_forget()
+        Game.init_app(win)
     else:
         label.place(relx=0.5, rely=0.57, height=25, width=430, anchor="center")
         label.after(5000, lambda: label.place_forget()) # 5000 ms
