@@ -1,5 +1,41 @@
 from tkinter import *
 import math
+import random
+
+def create_ball(canvas, x, y, color):
+    return canvas.create_oval(x, y, x+20, y+20, fill=color)
+
+def move_towards_point(canvas, ball, target_x, target_y):
+    coords = canvas.coords(ball)
+    start_x = (coords[0] + coords[2]) / 2
+    start_y = (coords[1] + coords[3]) / 2
+    dx = target_x - start_x
+    dy = target_y - start_y
+    distance = ((dx ** 2) + (dy ** 2)) ** 0.5
+    if distance != 0:
+        steps = int(distance // 5)
+        dx_step = dx / steps
+        dy_step = dy / steps
+
+    def move_step(step):
+        nonlocal start_x, start_y
+        if step < 400:
+            start_x += dx_step
+            start_y += dy_step
+            canvas.move(ball, dx_step, dy_step)
+            canvas.after(10, move_step, step+1)
+        else:
+            canvas.delete(ball)
+
+    move_step(0)
+
+def click_event(event,canvas):
+    colors = ["red", "blue", "yellow", "green", "orange"]
+    color = random.choice(colors)
+    ball = create_ball(canvas, 125, 150, color)  # Создаем шар в центре экрана
+    move_towards_point(canvas, ball, event.x, event.y)
+
+
 
 
 def init_rotating_shape(canvas, shape, center_x, center_y):
@@ -46,3 +82,4 @@ def init_app(root):
     draw, update_angle = init_rotating_shape(canvas, shape, center_x, center_y)
 
     canvas.bind("<Motion>", update_angle)
+    canvas.bind("<Button-1>", lambda event: click_event(event, canvas))
