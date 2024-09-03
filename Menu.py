@@ -1,5 +1,5 @@
 from tkinter import *
-from tkinter import ttk
+import tkinter as tk
 from tkinter import font
 import Game
 import math
@@ -69,12 +69,12 @@ def proverka(new_text):
         return False
 
 
-win = Tk()
+win = tk.Tk()
 win.title('Zuzu главный') # Name window
 win.attributes('-fullscreen', True) # fullscreen
 
 # Icon
-win.iconbitmap("duck.ico")
+win.iconbitmap("duck.png")
 
 # Image
 win_bg = PhotoImage(file="background_1.png")
