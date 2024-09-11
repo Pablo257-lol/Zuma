@@ -18,7 +18,7 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
     dy = target_y - start_y
     distance = ((dx ** 2) + (dy ** 2)) ** 0.5
     if distance != 0:
-        steps = int(distance // 30) # Скорость полета шара
+        steps = int(distance // 50)# Скорость полета шара
         dx_step = dx / steps
         dy_step = dy / steps
 
@@ -29,41 +29,21 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
             start_x += dx_step
             start_y += dy_step
 
-
             # Проверка на прикосновение шара к другому
             for (x, y, color, ball_id, kol) in chain_balls:
 
-                # Условие при столкновении летящего шара с другим и они должны быть одинакового цвета
-                if ((start_x - x) ** 2 + (start_y - y) ** 2) <= (25 * 2) ** 2 and color_ball == color:
-                    canvas.delete(ball) # Удаление летящего шара
-                    canvas.delete(ball_id) # Удаление шара, с которым столкнулся летящий шар
-                    chain_balls.remove((x, y, color, ball_id, kol)) # и удаление его из списка
-
-                    for _ in range(10):
-                        for i in range(kol - 1, len(chain_balls)):
-                            canvas.move((chain_balls[i])[3], -5, 0) # Передвигает цепочку шаров на 5 пикселей назад
-                        canvas.update()
-                        time.sleep(0.01) # повторяет цикл перемещением шаров, с интервалом 0,01 сек.
-
-                    # Изменяет данные в записях у шаров
-                    for a in range(kol - 1, len(chain_balls)):
-                        list_index = list(chain_balls[a])
-                        list_index[4] -= 1
-                        list_index[0] -= 50
-                        chain_balls[a] = tuple(list_index)
-                    return
-
-                # Условие при столкновении летящего шара с другим и они должны быть разнового цвета
-                if ((start_x - x) ** 2 + (start_y - y) ** 2) <= (25 * 2) ** 2 and color_ball != color:
-                    canvas.delete(ball)
-                    for _ in range(10):
-                        for i in range(kol, len(chain_balls)):
-                            canvas.move((chain_balls[i])[3], 5, 0)
-                        canvas.update()
-                        time.sleep(0.01)  # повторяет цикл перемещением шаров, с интервалом 0,01 сек.
-
+                # Смещение цепочки и создание в ней нового шара
+                def changing_chain(kol):
                     # Создает шар в цепочке
                     if kol < len(chain_balls):
+
+                        # повторяет цикл перемещением шаров, с интервалом 0,01 сек.
+                        for _ in range(10):
+                            for i in range(kol, len(chain_balls)):
+                                canvas.move((chain_balls[i])[3], 5, 0)
+                            canvas.update()
+                            time.sleep(0.01)
+
                         index = kol
                         x1 = int(canvas.coords(chain_balls[index][3])[0] - 25)
                         y1 = 800
@@ -76,11 +56,73 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
                             list_index[4] += 1
                             list_index[0] += 50
                             chain_balls[a] = tuple(list_index)
+
+                    else:
+                        # Если шар попадет в самый последний шар
+                        x1 = int(canvas.coords(chain_balls[kol - 1][3])[0] + 25 * 3)
+                        y1 = 800
+                        new_id = canvas.create_oval(x1 - 25, y1 - 25, x1 + 25, y1 + 25, fill=color_ball)
+                        chain_balls.insert(kol, (x1, y1, color_ball, new_id, kol + 1))
+
+                # Условие при столкновении летящего шара с другим и они должны быть одинакового цвета
+                # if ((start_x - x) ** 2 + (start_y - y) ** 2) <= (25 * 2) ** 2 and color_ball == color:
+                #     canvas.delete(ball) # Удаление летящего шара
+                #     canvas.delete(ball_id) # Удаление шара, с которым столкнулся летящий шар
+                #     chain_balls.remove((x, y, color, ball_id, kol)) # и удаление его из списка
+                #
+                #     for _ in range(10):
+                #         for i in range(kol - 1, len(chain_balls)):
+                #             canvas.move((chain_balls[i])[3], -5, 0) # Передвигает цепочку шаров на 5 пикселей назад
+                #         canvas.update()
+                #         time.sleep(0.01) # повторяет цикл перемещением шаров, с интервалом 0,01 сек.
+                #
+                #     # Изменяет данные в записях у шаров
+                #     for a in range(kol - 1, len(chain_balls)):
+                #         list_index = list(chain_balls[a])
+                #         list_index[4] -= 1
+                #         list_index[0] -= 50
+                #         chain_balls[a] = tuple(list_index)
+                #     return
+
+
+                # Условие при столкновении летящего шара с другим и они должны быть разного цвета
+                if ((start_x - x) ** 2 + (start_y - y) ** 2) <= (25 * 2) ** 2:
+
+                    # Условие чтобы шар был сзади
+                    if start_x < x:
+                        canvas.delete(ball)
+                        changing_chain(kol - 1)
+
+                    # Условие чтобы шар был спереди
+                    if start_x == x or start_x > x:
+                        canvas.delete(ball)
+                        changing_chain(kol)
+                        kol += 1
+########################################################################
+                    index_kol = kol
+                    dele = []
+                    kol_dele = 1
+                    dele.append(index_kol)
+                    while chain_balls[index_kol - 1][2] == chain_balls[index_kol - 2][2]:
+                        kol_dele += 1
+                        dele.append(index_kol - 1)
+                        index_kol -= 1
+
+                    while chain_balls[kol - 1][2] == chain_balls[kol][2]:
+                        kol_dele += 1
+                        dele.append(kol + 1)
+                        kol += 1
+
+##################################################################
+                    length = len(dele)
+                    for excess in range(dele[0], dele[length - 1]):
+                        print(excess)
+
                     return
 
-
+            # Передвигает летящий шар каждые 20 мс.
             canvas.move(ball, dx_step, dy_step)
-            canvas.after(10, move_step, step + 1)
+            canvas.after(20, move_step, step + 1)
         else:
             # Удаляет летящий шар, когда он достигает конца окна
             canvas.delete(ball)
@@ -111,7 +153,7 @@ def update_preview_color(canvas, preview_ball, second_ball, colors):
     color_sec = random.choice(colors)
     canvas.itemconfig(second_ball, fill= color_sec)
 
-# Функция которая заменяет цвета шаров предварительного просмотра на противоположные
+# Функция, которая заменяет цвета шаров предварительного просмотра на противоположные
 def color_replacement(event, canvas, preview_ball, second_ball):
     first_color = canvas.itemcget(preview_ball, 'fill')
     second_color = canvas.itemcget(second_ball, 'fill')
@@ -199,4 +241,3 @@ def init_app(root):
     canvas.bind("<Motion>", update_angle)
     canvas.bind("<Button-3>", lambda event: color_replacement(event, canvas, preview_ball, second_ball))
     canvas.bind("<Button-1>", lambda event: click_event(event, canvas, chain_balls, preview_ball, second_ball, colors))
-
