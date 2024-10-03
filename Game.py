@@ -42,40 +42,37 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
                         print(speeds)
                         for _ in range(17):
                             for i in range(kol, len(chain_balls)):
-                                save = 0
+                                check = True
                                 index_speed = chain_balls[i][5]
                                 list_index = list(chain_balls[i])
+                                list_index[0] += speeds[index_speed - 1][0]
+                                list_index[1] += speeds[index_speed - 1][1]
+                                print(i, abs(moving_points[(chain_balls[i][5])][0] - int(chain_balls[i][0])), speeds[index_speed - 1][0], abs(moving_points[(chain_balls[i][5])][1] - int(chain_balls[i][1])), speeds[index_speed - 1][1], chain_balls[i])
 
-                                print(i, abs(moving_points[(chain_balls[i][5])][0] - chain_balls[i][0]), abs(speeds[index_speed - 1][0]), abs(moving_points[(chain_balls[i][5])][1] - chain_balls[i][1]), abs(speeds[index_speed - 1][1]), chain_balls[i])
                                 if speeds[index_speed - 1][0] != 0 and speeds[index_speed - 1][1] != 0:
-                                    if abs(moving_points[index_speed][0] - chain_balls[i][0]) <= round(abs(speeds[index_speed - 1][0])) and abs(moving_points[index_speed][1] - int(chain_balls[i][1])) <= round(abs(speeds[index_speed - 1][1])):
+                                    if abs(moving_points[(chain_balls[i][5])][0] - chain_balls[i][0]) <= abs(speeds[index_speed - 1][0]) and abs(moving_points[(chain_balls[i][5])][1] - int(chain_balls[i][1])) <= abs(speeds[index_speed - 1][1]):
                                         list_index[5] += 1
-                                        list_index[0] = moving_points[index_speed][0]
-                                        list_index[1] = moving_points[index_speed][1]
-                                        save += 1
+                                        list_index[0] = moving_points[(chain_balls[i][5])][0]
+                                        list_index[1] = moving_points[(chain_balls[i][5])][1]
+                                        check = False
                                 else:
                                     if speeds[index_speed - 1][0] != 0:
-                                        if abs(moving_points[index_speed][0] - chain_balls[i][0]) <= round(abs(speeds[index_speed - 1][0])):
+                                        if abs(moving_points[(chain_balls[i][5])][0] - chain_balls[i][0]) <= abs(speeds[index_speed - 1][0]):
                                             list_index[5] += 1
-                                            list_index[0] = moving_points[index_speed][0]
-                                            list_index[1] = moving_points[index_speed][1]
-                                            save += 1
+                                            list_index[0] = moving_points[(chain_balls[i][5])][0]
+                                            check = False
                                     else:
-                                        if abs(moving_points[index_speed][1] - chain_balls[i][1]) <= round(abs(speeds[index_speed - 1][1])):
+                                        if abs(moving_points[(chain_balls[i][5])][1] - chain_balls[i][1]) <= abs(speeds[index_speed - 1][1]):
                                             list_index[5] += 1
-                                            list_index[0] = moving_points[index_speed][0]
-                                            list_index[1] = moving_points[index_speed][1]
-                                            save += 1
+                                            list_index[1] = moving_points[(chain_balls[i][5])][1]
+                                            check = False
 
-                                        else:
-                                            list_index[0] += round(speeds[index_speed - 1][0])
-                                            list_index[1] += round(speeds[index_speed - 1][1])
-                                if save == 0:
+                                if check:
                                     canvas.move((chain_balls[i])[3], speeds[index_speed - 1][0], speeds[index_speed - 1][1])
-                                    chain_balls[i] = tuple(list_index)
                                 else:
-                                    canvas.move((chain_balls[i])[3], (moving_points[index_speed][0] - chain_balls[i][0]), (moving_points[index_speed][1] - chain_balls[i][1]))
-                                    chain_balls[i] = tuple(list_index)
+                                    canvas.move((chain_balls[i])[3], (moving_points[chain_balls[i][5]][0] - chain_balls[i][0]), (moving_points[chain_balls[i][5]][1] - chain_balls[i][1]))
+                                chain_balls[i] = tuple(list_index)
+
                             canvas.update()
                             time.sleep(0.01)
 
@@ -121,6 +118,7 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
                         changing_chain(kol - 1)
                         resume_movement(canvas, chain_balls, moving_points, colors, speeds, cou_balls)
 
+
                     # Условие, чтобы шар был спереди
                     if distant_start_x + distant_start_y <= distant_x + distant_y:
                         if kol == len(chain_balls):
@@ -129,11 +127,13 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
                             kol += 1
                         else:
                             print('перед')
+                            print(chain_balls)
                             stop_movement()
                             canvas.delete(ball)
                             changing_chain(kol)
                             kol += 1
                             resume_movement(canvas, chain_balls, moving_points, colors, speeds, cou_balls)
+                            print(chain_balls)
 
                     index_kol = kol
                     dele = []
@@ -171,56 +171,25 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
                         for _ in range(kol_dele):
                             for i in range(17):
                                 for a in range(index - 1, len(chain_balls)):
-                                    save = 0
                                     index_speed = chain_balls[a][5]
                                     list_index = list(chain_balls[a])
-
-                                    if speeds[index_speed - 1][0] != 0 and speeds[index_speed - 1][1] != 0:
-                                        if abs(moving_points[index_speed - 1][0] - chain_balls[a][0]) <= round(abs(speeds[index_speed - 1][0])) and abs(moving_points[index_speed - 1][1] - int(chain_balls[a][1])) <= round(abs(speeds[index_speed - 1][1])):
-                                            list_index[5] -= 1
-                                            list_index[0] = moving_points[index_speed - 1][0]
-                                            list_index[1] = moving_points[index_speed - 1][1]
-                                            save += 1
-                                    else:
-                                        if speeds[index_speed - 1][0] != 0:
-                                            print(moving_points[index_speed - 1], chain_balls[a], 'x')
-
-                                            if abs(moving_points[index_speed - 1][0] - chain_balls[a][0]) <= abs(speeds[index_speed - 1][0]):
-                                                list_index[5] -= 1
-                                                list_index[0] = moving_points[index_speed - 1][0]
-                                                list_index[1] = moving_points[index_speed - 1][1]
-                                                save += 1
-                                        else:
-                                            print(moving_points[index_speed - 1], chain_balls[a], 'y')
-
-                                            if abs(moving_points[index_speed - 1][1] - chain_balls[a][1]) <= abs(speeds[index_speed - 1][1]):
-                                                list_index[5] -= 1
-                                                list_index[0] = moving_points[index_speed - 1][0]
-                                                list_index[1] = moving_points[index_speed - 1][1]
-                                                save += 1
-
-                                            else:
-                                                list_index[0] -= speeds[index_speed - 1][0] #########################################################
-                                                list_index[1] -= speeds[index_speed - 1][1] #########################################################
-
+                                    list_index[0] -= speeds[index_speed - 1][0] #########################################################
+                                    list_index[1] -= speeds[index_speed - 1][1] #########################################################
                                     if i == 16:
                                         list_index[4] -= 1
+                                    print(moving_points[(chain_balls[a][5]) - 1], chain_balls[a], speeds[index_speed - 1])
+                                    if abs(moving_points[(chain_balls[a][5]) - 1][0] - chain_balls[a][0]) <= abs(speeds[index_speed - 1][0]) and abs(moving_points[(chain_balls[a][5]) - 1][1] - chain_balls[a][1]) <= abs(speeds[index_speed - 1][1]):
+                                        list_index[5] -= 1
                                     chain_balls[a] = tuple(list_index)
 
-                                    if save == 0:
-                                        canvas.move((chain_balls[a])[3], -speeds[index_speed - 1][0], -speeds[index_speed - 1][1])
-                                        chain_balls[a] = tuple(list_index)
-                                    else:
-                                        canvas.move((chain_balls[i])[3],-(moving_points[index_speed - 1][0] - chain_balls[a][0]),-(moving_points[index_speed - 1][1] - chain_balls[a][1]))
-                                        chain_balls[a] = tuple(list_index)
-
-
-                                    coords = canvas.coords(chain_balls[a][3])
-                                    print((coords[0] + coords[2]) / 2, (coords[1] + coords[3]) / 2)
+                                    # повторяем цикл перемещением шаров, с интервалом 0,01 сек.
+                                    canvas.move((chain_balls[a])[3], -speeds[index_speed - 1][0], -speeds[index_speed - 1][1])
                                 canvas.update()
-                                time.sleep(0.01) # повторяем цикл перемещением шаров, с интервалом 0,01 сек.
+                                time.sleep(0.01)
 
+                                print(chain_balls)
                         resume_movement(canvas, chain_balls, moving_points, colors, speeds, cou_balls)
+                        print(chain_balls)
 ########################################################################################################################
 
 ######################################################## REPLAY ########################################################
@@ -268,37 +237,14 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
                                             for a in range(index - 1, len(chain_balls)):
                                                 index_speed = chain_balls[a][5]
                                                 list_index = list(chain_balls[a])
-
-                                                if round(speeds[index_speed - 1][0]) != 0 and round(speeds[index_speed - 1][1]) != 0:
-                                                    if abs(moving_points[index_speed - 1][0] - chain_balls[a][0]) <= round(abs(speeds[index_speed - 1][0])) and abs(moving_points[index_speed - 1][1] - int(chain_balls[a][1])) <= round(
-                                                            abs(speeds[index_speed - 1][1])):
-                                                        list_index[5] -= 1
-                                                        list_index[0] = moving_points[index_speed - 1][0]
-                                                        list_index[1] = moving_points[index_speed - 1][1]
-                                                        chain_balls[a] = tuple(list_index)
-                                                else:
-                                                    if speeds[index_speed - 1][0] != 0:
-                                                        print(moving_points[index_speed - 1], chain_balls[a], 'x')
-
-                                                        if abs(moving_points[index_speed - 1][0] - chain_balls[a][0]) <= round(abs(speeds[index_speed - 1][0])):
-                                                            list_index[5] -= 1
-                                                            list_index[0] = moving_points[index_speed - 1][0]
-                                                            list_index[1] = moving_points[index_speed - 1][1]
-                                                            chain_balls[a] = tuple(list_index)
-                                                    else:
-                                                        print(moving_points[index_speed - 1], chain_balls[a], 'y')
-
-                                                        if abs(moving_points[index_speed - 1][1] - chain_balls[a][1]) <= round(abs(speeds[index_speed - 1][1])):
-                                                            list_index[5] -= 1
-                                                            list_index[0] = moving_points[index_speed - 1][0]
-                                                            list_index[1] = moving_points[index_speed - 1][1]
-                                                            chain_balls[a] = tuple(list_index)
-
-                                                list_index[0] -= speeds[index_speed - 1][0]  #########################################################
-                                                list_index[1] -= speeds[index_speed - 1][1]  #########################################################
+                                                list_index[0] -= speeds[index_speed - 1][0]
+                                                list_index[1] -= speeds[index_speed - 1][1]
                                                 if i == 16:
                                                     list_index[4] -= 1
                                                 chain_balls[a] = tuple(list_index)
+                                                if abs(moving_points[(chain_balls[a][5]) - 1][0] - int(chain_balls[a][0])) < abs(speeds[index_speed - 1][0]) and abs(moving_points[(chain_balls[a][5]) - 1][1] - int(chain_balls[a][1])) < abs(speeds[index_speed - 1][1]):
+                                                    list_index[5] -= 1
+                                                    chain_balls[a] = tuple(list_index)
 
                                                 # повторяем цикл перемещением шаров, с интервалом 0,01 сек.
                                                 canvas.move((chain_balls[a])[3], -speeds[index_speed - 1][0], -speeds[index_speed - 1][1])
@@ -311,6 +257,7 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
                                     combo += 1
                                 else: return
                     return
+
 ########################################################################################################################
 
             # Передвигает летящий шар каждые 20 мс.
@@ -403,6 +350,9 @@ def calculation(speeds, moving_points):
 
 # Создает шар в цепочке и добавляет его в начало списка
 def init_chain(canvas, chain_balls, colors, spawn):
+    # if len(chain_balls) == cou_balls:
+    #     return
+    # else:
     spawn_x = spawn[0][0] # Начальные координаты шара
     spawn_y = spawn[0][1]
     color = random.choice(colors)
@@ -455,7 +405,7 @@ def move_balls(canvas, chain_balls, moving_points, colors, speeds, cou_balls):
                     list_index[1] += speeds[index - 1][1]
                     chain_balls[i] = tuple(list_index)
 
-                    if i + 1 == len(chain_balls) and distant == 17 and chek != cou_balls: # Создает новый шар когда начальный шар проходит нужную дистанцию и заканчивается когда создано нужное кол-во шаров
+                    if i + 1 == len(chain_balls) and distant == 17 and chek != cou_balls: # Создает новый шар когда начальный шар проходит нужную дистанцию
                         distant = 0
                         chek += 1
                         init_chain(canvas, chain_balls, colors, moving_points)
@@ -465,20 +415,17 @@ def move_balls(canvas, chain_balls, moving_points, colors, speeds, cou_balls):
         else:
             list_index = list(chain_balls[i])
             list_index[5] += 1
-            list_index[0] = moving_points[index][0]
-            list_index[1] = moving_points[index][1]
             chain_balls[i] = tuple(list_index)
             if (chain_balls[i][5]) - 1 == len(moving_points):
                 return move_balls
 
-    print(chain_balls)
     canvas.after(20, lambda: move_balls(canvas, chain_balls, moving_points, colors, speeds, cou_balls))
 
-def stop_movement(): # Остановка движения цепочки
+def stop_movement():
     global is_moving
     is_moving = False
 
-def resume_movement(canvas, chain_balls, moving_points, colors, speeds, cou_balls): # Возобновление движения цепочки
+def resume_movement(canvas, chain_balls, moving_points, colors, speeds, cou_balls):
     global is_moving
     is_moving = True
     move_balls(canvas, chain_balls, moving_points, colors, speeds, cou_balls)
@@ -498,7 +445,7 @@ def init_app(root):
     center_y = 150
     draw, update_angle = init_rotating_shape(canvas, shape, center_x, center_y)
 
-    cou_balls = 8 # Кол-во шаров
+    cou_balls = 30 # Кол-во шаров
     chain_balls = []
     moving_points = [(1500, 200), (1500, 700), (1300, 700), (1300, 200), (1100, 200), (1100, 700)]
     speeds = []
