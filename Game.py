@@ -486,6 +486,8 @@ def move_balls(canvas, chain_balls, moving_points, colors, speeds, cou_balls):
         else:
             list_index = list(chain_balls[i])
             list_index[5] += 1
+            # list_index[0] = moving_points[index][0]
+            # list_index[1] = moving_points[index][1]
             chain_balls[i] = tuple(list_index)
             if (chain_balls[i][5]) - 1 == len(moving_points):
                 return move_balls
