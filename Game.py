@@ -507,16 +507,42 @@ def resume_movement(canvas, chain_balls, moving_points, colors, speeds, cou_ball
     is_moving = True
     move_balls(canvas, chain_balls, moving_points, colors, speeds, cou_balls)
 
+def update(canvas, label, initial_value, current_value, line):
+    if current_value > 0:
+        current_value -= 1000
+        label.config(text=str(current_value))
+
+        # Обновление длины черты
+        length = (current_value / initial_value) * 791
+        canvas.coords(line, 618, 34, 618 + length, 34)
+
+        # Запланировать следующее обновление через 1 секунду
+        canvas.after(1000, update, canvas, label, initial_value, current_value, line)
 #########################################################################
 
 def init_app(root):
     canvas = tk.Canvas(root)
     canvas.pack(fill= BOTH, expand=True)
 
+#################################################### PANEL #############################################################
+    initial_value = 50000
+    current_value = initial_value
+    canvas.create_rectangle((533, 1), (1486, 64), width= 5, fill= 'yellow')
+    canvas.create_rectangle((618, 19), (1409, 49), width=5)
+    line = canvas.create_line(618, 34, 1409, 34, fill="cyan2", width=30)
+
+    label = tk.Label(canvas, text=str(current_value), background="#FFFF00", fg='black', borderwidth=5,font=("Arial", 30), relief='solid')
+    label.place(x=0, y=0, width=532, height=67)
+
+    # leave = Button
+    # btn_font = canvas.Font(family='Times new Roman', size=20)
+
+    update(canvas, label, initial_value, current_value, line)
+#######################################################################################################################
     # Список из которого будут рандомно выбираться цвета для шаров
     colors = ["red", "blue", "yellow", "green", "orange"]
 
-    # Пример многоугольника (треугольника)
+    # Пример многоугольника (прямугольника)
     shape = [(100, 100), (150, 100), (150, 200), (100, 200)]
     center_x = 125
     center_y = 150
@@ -527,11 +553,11 @@ def init_app(root):
     moving_points = [(1347, 132), (1149, 190), (1054, 256), (1027, 318), (1011, 411), (1030, 510), (1107, 594), (1189, 652), (1311, 694), (1425, 727), (1521, 787), (1576, 853), (1524, 930), (1402, 939), (1152, 880), (984, 807), (810, 865), (143, 933)]
     speeds = []
     init_chain(canvas, chain_balls, colors, moving_points) # Создание цепочки шаров
-    calculation(speeds, moving_points)
-    move_balls(canvas, chain_balls, moving_points, colors, speeds, cou_balls)
+    calculation(speeds, moving_points) # Высчитываем направление шаров в каждой зоны
+    move_balls(canvas, chain_balls, moving_points, colors, speeds, cou_balls) # Запуск анимации шаров
 
 
-    # Создаем шар для предварительного просмотра цвета
+    # Создаем шары для предварительного просмотра цвета
     preview_ball = canvas.create_oval(1686, 849, 1786, 949, fill="white")
     second_ball = canvas.create_oval(1710, 974, 1760, 1024, fill='white')
 
