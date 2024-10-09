@@ -10,7 +10,7 @@ pack1 = False
 pack2 = False
 
 def button():
-    # Кнопка которая выполняет команду farther
+    # Кнопка, которая выполняет команду farther
     btn_1 = Button(frame, font=btn_font, text='Начать игру', command=data_frame)
     btn_1.place(x= 1000, rely=0.25, height=100, width=500)
 

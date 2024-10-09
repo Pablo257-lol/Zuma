@@ -3,16 +3,18 @@ import time
 import tkinter as tk
 import math
 import random
+from tkinter import font
 
 from setuptools.command.rotate import rotate
 
 first = 0
+locked = True
 
 ####################### CREATING AND MOVING A BALL ############################
 def create_ball(canvas, x, y, color):
     return canvas.create_oval(x, y, x+50, y+50, fill=color)
 
-def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball, speeds, colors, moving_points, cou_balls):
+def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball, speeds, colors, moving_points, cou_balls, label, points, filename, current_value, initial_value, line):
     coords = canvas.coords(ball)
     start_x = (coords[0] + coords[2]) / 2
     start_y = (coords[1] + coords[3]) / 2
@@ -183,6 +185,8 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
                             chain_balls.remove((excess))
                         combo += 1
 
+                        decrease_number(canvas, label, points, filename, current_value, initial_value, line, combo, kol_dele) # Начисление очков
+
                         # Изменяем данные у шаров, в списке
                         stop_movement()
                         for _ in range(kol_dele):
@@ -276,6 +280,8 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
                                         chain_balls.remove((excess))
                                     combo_update += 1
 
+                                    decrease_number(canvas, label, points, filename, current_value, initial_value, line, combo_update, kol_dele) # Начисление очков
+
                                     stop_movement()
                                     for _ in range(kol_dele):
                                         for i in range(17):
@@ -341,10 +347,10 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
 
     move_step(0)
 
-def click_event(event,canvas, chain_balls, preview_ball, second_ball, colors, speeds, moving_points, cou_balls):
+def click_event(event,canvas, chain_balls, preview_ball, second_ball, colors, speeds, moving_points, cou_balls, label, points, filename, current_value, initial_value, line):
     c_ball = canvas.itemcget(preview_ball, 'fill')
     ball = create_ball(canvas, 125, 150, c_ball)  # Создаем шар в центре экрана
-    move_towards_point(canvas, ball, event.x, event.y, chain_balls, c_ball, speeds, colors, moving_points, cou_balls)
+    move_towards_point(canvas, ball, event.x, event.y, chain_balls, c_ball, speeds, colors, moving_points, cou_balls, label, points, filename, current_value, initial_value, line)
     update_preview_color(canvas, preview_ball, second_ball, colors)
 ################################################################################
 
@@ -406,7 +412,7 @@ def init_rotating_shape(canvas, shape, center_x, center_y):
     return draw, update_angle
 #################################################################################
 
-################################ BALLS ###################################
+################################ BALLS ##########################################
 def calculation(speeds, moving_points):
     for count in range(len(moving_points) - 1):
         dx = moving_points[count + 1][0] - moving_points[count][0]
@@ -446,6 +452,9 @@ def move_balls(canvas, chain_balls, moving_points, colors, speeds, cou_balls):
     global distant, is_moving
     if not is_moving:
         return
+
+    if len(chain_balls) == 0:
+        init_chain(canvas, chain_balls, colors, moving_points)
 
     for i in range(len(chain_balls)): # проходится по каждому шару в цепочке
         index = chain_balls[i][5]
@@ -496,7 +505,7 @@ def move_balls(canvas, chain_balls, moving_points, colors, speeds, cou_balls):
         # print(chain_balls[i], (coords[0] + coords[2]) / 2, (coords[1] + coords[3]) / 2)
 
     # print(chain_balls)
-    canvas.after(20, lambda: move_balls(canvas, chain_balls, moving_points, colors, speeds, cou_balls))
+    canvas.after(40, lambda: move_balls(canvas, chain_balls, moving_points, colors, speeds, cou_balls))
 
 def stop_movement():
     global is_moving
@@ -507,37 +516,70 @@ def resume_movement(canvas, chain_balls, moving_points, colors, speeds, cou_ball
     is_moving = True
     move_balls(canvas, chain_balls, moving_points, colors, speeds, cou_balls)
 
-def update(canvas, label, initial_value, current_value, line):
-    if current_value > 0:
-        current_value -= 1000
-        label.config(text=str(current_value))
 
+########################################################################################################################
+# Функция для изменения шкалы прогресса
+def update(canvas, initial_value, current_value, line):
+    if current_value > 0:
         # Обновление длины черты
         length = (current_value / initial_value) * 791
         canvas.coords(line, 618, 34, 618 + length, 34)
 
-        # Запланировать следующее обновление через 1 секунду
-        canvas.after(1000, update, canvas, label, initial_value, current_value, line)
-#########################################################################
+
+# Функция для чтения числа из файла
+def read_points_from_file(filename):
+    with open('Points.txt', 'r') as file:
+        number = file.read().strip()
+    return int(number)
+
+# Функция для записи числа в файл
+def write_number_to_file(filename, number):
+    with open('Points.txt', 'w') as file:
+        file.write(str(number))
+
+# Функция для увеличения очков
+def decrease_number(canvas, label, points, filename, current_value, initial_value, line, combo, kol_dele):
+    points[0] += (100 * kol_dele) * combo
+    current_value -= points[0]
+    label.config(text=str(points[0]))
+    write_number_to_file(filename, points[0])  # Обновляем число в файле
+    update(canvas, initial_value, current_value, line) # Изменяем шкалу прогресса
+
+####################################################################### MAIN PART ############################################################################################################
 
 def init_app(root):
     canvas = tk.Canvas(root)
     canvas.pack(fill= BOTH, expand=True)
 
+    btn_font = font.Font(family='Times new Roman', size=20)
+
 #################################################### PANEL #############################################################
-    initial_value = 50000
+    filename = 'points.txt'
+    points = [read_points_from_file(filename)]
+
+    initial_value = 10000 # Кол-во очков, которых нужно набрать в уровне
     current_value = initial_value
-    canvas.create_rectangle((533, 1), (1486, 64), width= 5, fill= 'yellow')
+
+    canvas.create_rectangle((528, 2), (1483, 64), width= 5, fill= 'yellow')
     canvas.create_rectangle((618, 19), (1409, 49), width=5)
     line = canvas.create_line(618, 34, 1409, 34, fill="cyan2", width=30)
 
-    label = tk.Label(canvas, text=str(current_value), background="#FFFF00", fg='black', borderwidth=5,font=("Arial", 30), relief='solid')
+    label = tk.Label(canvas, text=str(points[0]), background="#FFFF00", fg='black', borderwidth=5,font=("Arial", 30), relief='solid')
     label.place(x=0, y=0, width=532, height=67)
 
-    # leave = Button
-    # btn_font = canvas.Font(family='Times new Roman', size=20)
+    def locked_or_unlocked():
+        global locked
+        locked = not locked
+        if locked:
+            enable_events()
+            resume_movement(canvas, chain_balls, moving_points, colors, speeds, cou_balls)
+        else:
+            disable_events()
+            stop_movement()
 
-    update(canvas, label, initial_value, current_value, line)
+    pause_but = tk.Button(canvas, text= 'Приостановить', font= btn_font, bg= "#FFFF00", fg= 'black', borderwidth= 10, command= locked_or_unlocked)
+    pause_but.place(x= 1486, width= 444, height= 67)
+
 #######################################################################################################################
     # Список из которого будут рандомно выбираться цвета для шаров
     colors = ["red", "blue", "yellow", "green", "orange"]
@@ -548,7 +590,7 @@ def init_app(root):
     center_y = 150
     draw, update_angle = init_rotating_shape(canvas, shape, center_x, center_y)
 
-    cou_balls = 30 # Кол-во шаров
+    cou_balls = 100 # Кол-во шаров
     chain_balls = []
     moving_points = [(1347, 132), (1149, 190), (1054, 256), (1027, 318), (1011, 411), (1030, 510), (1107, 594), (1189, 652), (1311, 694), (1425, 727), (1521, 787), (1576, 853), (1524, 930), (1402, 939), (1152, 880), (984, 807), (810, 865), (143, 933)]
     speeds = []
@@ -564,6 +606,14 @@ def init_app(root):
     # Запускаем обновление цвета предварительного просмотра
     update_preview_color(canvas, preview_ball, second_ball, colors)
 
-    canvas.bind("<Motion>", update_angle)
-    canvas.bind("<Button-3>", lambda event: color_replacement(event, canvas, preview_ball, second_ball))
-    canvas.bind("<Button-1>", lambda event: click_event(event, canvas, chain_balls, preview_ball, second_ball, colors, speeds, moving_points, cou_balls))
+    def enable_events():
+        canvas.bind("<Motion>", update_angle)
+        canvas.bind("<Button-3>", lambda event: color_replacement(event, canvas, preview_ball, second_ball))
+        canvas.bind("<Button-1>", lambda event: click_event(event, canvas, chain_balls, preview_ball, second_ball, colors, speeds, moving_points, cou_balls, label, points, filename, current_value, initial_value, line))
+
+    def disable_events():
+        canvas.unbind("<Motion>")
+        canvas.unbind("<Button-3>")
+        canvas.unbind("<Button-1>")
+
+    enable_events()
