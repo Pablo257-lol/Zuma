@@ -348,6 +348,7 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
     move_step(0)
 
 def click_event(event,canvas, chain_balls, preview_ball, second_ball, colors, speeds, moving_points, cou_balls, label, points, filename, current_value, initial_value, line):
+    # canvas.unbind("<Button-1>")
     c_ball = canvas.itemcget(preview_ball, 'fill')
     ball = create_ball(canvas, 125, 150, c_ball)  # Создаем шар в центре экрана
     move_towards_point(canvas, ball, event.x, event.y, chain_balls, c_ball, speeds, colors, moving_points, cou_balls, label, points, filename, current_value, initial_value, line)
@@ -515,6 +516,7 @@ def resume_movement(canvas, chain_balls, moving_points, colors, speeds, cou_ball
     global is_moving
     is_moving = True
     move_balls(canvas, chain_balls, moving_points, colors, speeds, cou_balls)
+    # canvas.bind("<Button-1>",lambda event: click_event(event, canvas, chain_balls, preview_ball, second_ball, colors, speeds, moving_points, cou_balls, label, points, filename, current_value,initial_value, line))
 
 
 ########################################################################################################################
@@ -545,9 +547,17 @@ def decrease_number(canvas, label, points, filename, current_value, initial_valu
     write_number_to_file(filename, points[0])  # Обновляем число в файле
     update(canvas, initial_value, current_value, line) # Изменяем шкалу прогресса
 
+
+
+
 ####################################################################### MAIN PART ############################################################################################################
 
-def init_app(root):
+def init_app(root, init_app_two):
+
+    # Очистим всё, что было на экране
+    for widget in root.winfo_children():
+        widget.destroy()
+
     canvas = tk.Canvas(root)
     canvas.pack(fill= BOTH, expand=True)
 
@@ -567,15 +577,35 @@ def init_app(root):
     label = tk.Label(canvas, text=str(points[0]), background="#FFFF00", fg='black', borderwidth=5,font=("Arial", 30), relief='solid')
     label.place(x=0, y=0, width=532, height=67)
 
-    def locked_or_unlocked():
+    def locked_or_unlocked(): # Создание окна паузы
         global locked
+        nonlocal pau, label_2, but_end, but_continue
         locked = not locked
         if locked:
             enable_events()
             resume_movement(canvas, chain_balls, moving_points, colors, speeds, cou_balls)
+            canvas.delete(pau)
+            label_2.pack_forget()
+            but_end.destroy()
+            but_continue.destroy()
+            pause_but.config(state= tk.NORMAL)
         else:
             disable_events()
             stop_movement()
+            pau = canvas.create_rectangle((477, 304), (1431, 774), fill='#FFFF00', outline='black', width=5)
+            label_2.pack(padx= 711, pady= 369)
+            but_end = tk.Button(canvas, text='Завершить уровень', font=btn_font, command= lambda: init_app_two(root))
+            but_continue = tk.Button(canvas, text='Возобновить', font=btn_font, command=locked_or_unlocked)
+
+            canvas.create_window(726, 645, window= but_end)
+            canvas.create_window(1184, 645, window= but_continue)
+            pause_but.config(state= tk.DISABLED)
+
+
+    pau = None
+    label_2 = tk.Label(canvas, text='ПАУЗА', font=('Times new Roman', 50), bg='#FFFF00')
+    but_end = tk.Button(canvas, text='Завершить уровень', font=btn_font, command= lambda: init_app_two(root))
+    but_continue = tk.Button(canvas, text='Возобновить', font=btn_font, command=locked_or_unlocked)
 
     pause_but = tk.Button(canvas, text= 'Приостановить', font= btn_font, bg= "#FFFF00", fg= 'black', borderwidth= 10, command= locked_or_unlocked)
     pause_but.place(x= 1486, width= 444, height= 67)
