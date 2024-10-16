@@ -150,6 +150,7 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
                             stop_movement()
                             canvas.delete(ball)
                             changing_chain(kol)
+                            kol += 1
                             resume_movement(canvas, chain_balls, moving_points, colors, speeds, cou_balls)
                             print(chain_balls)
 
@@ -157,7 +158,6 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
                     dele = []
                     kol_dele = 1
                     dele.append(index_kol)
-                    print(index_kol, dele, kol_dele)
                     # Проверяем кол-во шаров одинакового цвета, которые идут сзади от летящего шара
                     while index_kol >= 2 and chain_balls[index_kol - 1][2] == chain_balls[index_kol - 2][2]:
                         kol_dele += 1
@@ -173,8 +173,6 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
 
                     # Сортируем список по убыванию, в котором находятся индексы шаров с одинаковым цветом
                     dele.sort(reverse= True)
-
-                    print(dele, kol)
                     # Если шаров с одинаковым цветом будет не менее 3, то их удаляем везде
                     if kol_dele >= 3:
                         for excess in range(0, len(dele)):
@@ -206,7 +204,7 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
 
                                     if speeds[index_speed - 1][0] != 0 and speeds[index_speed - 1][1] != 0:
                                         if abs(moving_points[(chain_balls[a][5]) - 1][0] - chain_balls[a][0]) <= abs(speeds[index_speed - 1][0]) and abs(moving_points[(chain_balls[a][5]) - 1][1] - chain_balls[a][1]) <= abs(speeds[index_speed - 1][1]):
-                                            # print(chain_balls[a])
+                                            print(chain_balls[a])
                                             list_index[5] -= 1
                                             list_index[0] = moving_points[(chain_balls[a][5]) - 1][0]
                                             list_index[1] = moving_points[(chain_balls[a][5]) - 1][1]
@@ -215,14 +213,14 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
                                     else:
                                         if speeds[index_speed - 1][0] != 0:
                                             if abs(moving_points[(chain_balls[a][5]) - 1][0] - chain_balls[a][0]) <= abs(speeds[index_speed - 1][0]):
-                                                # print(chain_balls[a])
+                                                print(chain_balls[a])
                                                 list_index[5] -= 1
                                                 list_index[0] = moving_points[(chain_balls[a][5]) - 1][0]
                                                 chek = False
 
                                         else:
                                             if abs(moving_points[(chain_balls[a][5]) - 1][1] - chain_balls[a][1]) <= abs(speeds[index_speed - 1][1]):
-                                                # print(chain_balls[a])
+                                                print(chain_balls[a])
                                                 list_index[5] -= 1
                                                 list_index[1] = moving_points[(chain_balls[a][5]) - 1][1]
                                                 chek = False
@@ -248,10 +246,6 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
                     if combo != 0:
                         combo_update = combo
                         kol = dele[-1]
-                        dele = [kol]
-
-                        print(dele, kol)
-                        print(chain_balls)
                         # Точно такой же процесс, как и первый
                         if kol < len(chain_balls) and kol != 1:
                             while (kol >= 2 and chain_balls[kol - 1][2] == chain_balls[kol - 2][2]) or (kol != len(chain_balls) and chain_balls[kol - 1][2] == chain_balls[kol][2]):
@@ -492,7 +486,7 @@ def move_balls(canvas, chain_balls, moving_points, colors, speeds, cou_balls):
                     list_index[1] += speeds[index - 1][1]
                     chain_balls[i] = tuple(list_index)
 
-                    if i + 1 == len(chain_balls) and distant >= 17 and chek != cou_balls: # Создает новый шар когда начальный шар проходит нужную дистанцию
+                    if i + 1 == len(chain_balls) and distant == 17 and chek != cou_balls: # Создает новый шар когда начальный шар проходит нужную дистанцию
                         distant = 0
                         chek += 1
                         init_chain(canvas, chain_balls, colors, moving_points)
@@ -628,14 +622,14 @@ def init_app(root, init_app_two):
 
     cou_balls = 100 # Кол-во шаров
     chain_balls = []
-    moving_points = [(1347, 132), (1149, 190), (1054, 256), (1027, 318), (1011, 411), (1030, 510), (1107, 594), (1189, 652), (1311, 694), (1425, 727), (1521, 787), (1576, 853), (1524, 930), (1402, 939), (1152, 880), (984, 807), (810, 865), (143, 933), (135, 720), (1800, 720), (1800, 200), (1400, 200), (1400, 500), (700, 500), (1000, 100), (1800, 100), (1500, 800), (650, 635), (100, 1000), (800, 300)]
+    moving_points = [(1347, 132), (1149, 190), (1054, 256), (1027, 318), (1011, 411), (1030, 510), (1107, 594), (1189, 652), (1311, 694), (1425, 727), (1521, 787), (1576, 853), (1524, 930), (1402, 939), (1152, 880), (984, 807), (810, 865), (143, 933)]
     speeds = []
     init_chain(canvas, chain_balls, colors, moving_points) # Создание цепочки шаров
     calculation(speeds, moving_points) # Высчитываем направление шаров в каждой зоны
     move_balls(canvas, chain_balls, moving_points, colors, speeds, cou_balls) # Запуск анимации шаров
 
 
-    # Создаем шары для предварительного просмотра цвета`
+    # Создаем шары для предварительного просмотра цвета
     preview_ball = canvas.create_oval(1686, 849, 1786, 949, fill="white")
     second_ball = canvas.create_oval(1710, 974, 1760, 1024, fill='white')
 
