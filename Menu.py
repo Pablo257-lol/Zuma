@@ -5,7 +5,7 @@ from tkinter import font
 import Game
 import re
 
-data = "text.txt"
+data = "Data/text.txt"
 pack1 = False
 pack2 = False
 pack3 = True
@@ -44,7 +44,7 @@ def data_frame(frame, frame1_2):
 # если длинна текста будет не меньше 8 символов
 def save_text(entry, frame, label, frame1_2):
     if len(entry.get()) >= 8:
-        with open("text.txt", "w") as file:
+        with open("Data/text.txt", "w") as file:
             file.write(entry.get())
         file.close()
         frame.pack_forget()
@@ -107,7 +107,7 @@ def init_app_two(win):
     clean()
 
     # Image
-    win_bg = PhotoImage(file="background_1.png")
+    win_bg = PhotoImage(file="Images/background_1.png")
     btn_font = font.Font(family='Times new Roman', size=30)
 
     # Frame
@@ -158,7 +158,7 @@ def init_app_two(win):
     canvas.configure(yscrollcommand=scrollbar.set)
 
     # Чтение и отображение строк из файла, отсортированных по числам
-    filename = 'Players.txt'  # Задайте путь к вашему файлу
+    filename = 'Data/Players.txt'  # Задайте путь к вашему файлу
     lines = read_and_sort_lines_by_number(filename)
 
     for line in lines:

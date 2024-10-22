@@ -464,7 +464,7 @@ def end(canvas, points, root, init_app_two):
     label_points = tk.Label(canvas_end, text= f'Количество набранных очков: {points[0]}', bg= 'yellow', font=('Arial', 30))
     label_points.place(relx= 0.14, rely= 0.4)
 
-    update_data(points[1], points[0], 'Players.txt')
+    update_data(points[1], points[0], 'Data/Players.txt')
 
     def comanda(root, init_app_two):
         global save, clean_ball
@@ -636,7 +636,7 @@ def reset(root, init_app_two):
     distant = 0
     is_moving = True
     chek = 1
-    write_number_to_file('points.txt', 0)
+    write_number_to_file('Data/points.txt', 0)
     if save:
         init_app_two(root)
     else:
@@ -657,10 +657,10 @@ def init_app(root, init_app_two):
     btn_font = font.Font(family='Times new Roman', size=20)
 
 #################################################### PANEL #############################################################
-    filename = 'points.txt'
+    filename = 'Data/points.txt'
     points = [read_points_from_file(filename)]
 
-    name = read_name_from_file('text.txt')
+    name = read_name_from_file('Data/text.txt')
     points.append(name)
 
     initial_value = 10000 # Кол-во очков, которых нужно набрать в уровне
@@ -720,7 +720,7 @@ def init_app(root, init_app_two):
 
     cou_balls = 100 # Кол-во шаров
     chain_balls = []
-    moving_points = [(1347, 132), (1149, 190)]
+    moving_points = [(1347, 132), (1149, 190), (100, 500)]
     speeds = []
     init_chain(canvas, chain_balls, colors, moving_points) # Создание цепочки шаров
     calculation(speeds, moving_points) # Высчитываем направление шаров в каждой зоны
