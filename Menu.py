@@ -1,4 +1,3 @@
-from multiprocessing.connection import answer_challenge
 from tkinter import *
 import tkinter as tk
 from tkinter import font
@@ -43,7 +42,7 @@ def data_frame(frame, frame1_2):
 # Сохраняет введенные данные в файл text.txt,
 # если длинна текста будет не меньше 8 символов
 def save_text(entry, frame, label, frame1_2):
-    if len(entry.get()) >= 8:
+    if len(entry.get()) >= 4:
         with open("Data/text.txt", "w") as file:
             file.write(entry.get())
         file.close()
@@ -69,7 +68,7 @@ def farther(frame, frame3, btn_font, frame1_2):
 
 
 def proverka(new_text):
-    if re.match("^[a-zA-Z0-9]*$", new_text) and len(new_text) <= 16:
+    if re.match("^[a-zA-Z]*$", new_text) and len(new_text) <= 16:
         return True
     else:
         return False
@@ -125,7 +124,7 @@ def init_app_two(win):
     entry.place(relx= 0.49, rely= 0.4, height= 50, width= 300, anchor="center")
 
     label = Label(frame1_2,
-                      text="Введенное имя должно состоять не менее 8 символов",
+                      text="Введенное имя должно состоять не менее 4 символов",
                       foreground="red", background="lightblue", font=("Times new Roumen", 13))
 
     btn1_1 = Button(frame1_2, font= ('Times new Roman', 20), text= "Продолжить", command=lambda: save_text(entry, frame, label, frame1_2))
@@ -138,7 +137,7 @@ def init_app_two(win):
     bg_logo = Label(frame3, image= win_bg)
     bg_logo.pack()
 
-    frame3_2 = Frame(frame3, width=1050, height= 890, bg= "lightblue", highlightthickness=10, highlightbackground="black")
+    frame3_2 = Frame(frame3, width=1050, height= 680, bg= "lightblue", highlightthickness=10, highlightbackground="black")
     frame3_2.place(x= 450, y= 185)
     btn1_3 = Button(frame3, font= btn_font, text= 'Главное меню', command=lambda :farther(frame, frame3, btn_font, frame1_2))
     btn1_3.place(x= 1501, y= 17, height=137, width=403)
@@ -148,7 +147,7 @@ def init_app_two(win):
     canvas_line.place(x= 460, y= 285)
 
     # Создаем Canvas для размещения строк
-    canvas = tk.Canvas(frame3_2, width=1030, height= 890, bg="lightblue", highlightthickness=1, highlightbackground="lightblue")
+    canvas = tk.Canvas(frame3_2, width=1030, height= 780, bg="lightblue", highlightthickness=1, highlightbackground="lightblue")
     scrollbar = tk.Scrollbar(frame3_2, width= 50, orient=tk.VERTICAL, command=canvas.yview)
     scrollable_frame = tk.Frame(canvas, bg= 'lightblue')
 
