@@ -4,6 +4,7 @@ import tkinter as tk
 import math
 import random
 from tkinter import font
+from PIL import Image, ImageTk
 
 first = 0
 locked = True
@@ -14,7 +15,7 @@ clean_ball = False
 def create_ball(canvas, x, y, color):
     return canvas.create_oval(x, y, x+50, y+50, fill=color)
 
-def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball, speeds, colors, moving_points, cou_balls, label, points, filename, current_value, initial_value, line, root, init_app_two, preview_ball, second_ball):
+def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball, speeds, colors, moving_points, label, points, filename, current_value, initial_value, line, root, init_app_two, preview_ball, second_ball):
     coords = canvas.coords(ball)
     start_x = (coords[0] + coords[2]) / 2
     start_y = (coords[1] + coords[3]) / 2
@@ -22,7 +23,7 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
     dy = target_y - start_y
     distance = ((dx ** 2) + (dy ** 2)) ** 0.5
     if distance != 0:
-        steps = int(distance // 50) # Скорость полета шара
+        steps = distance / 50 # Скорость полета шара
         dx_step = dx / steps
         dy_step = dy / steps
 
@@ -144,7 +145,7 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
                             stop_movement()
                             canvas.delete(ball)
                             changing_chain(kol - 1)
-                            resume_movement(canvas, chain_balls, moving_points, colors, speeds, cou_balls, points, root, init_app_two)
+                            resume_movement(canvas, chain_balls, moving_points, colors, speeds, points, root, init_app_two)
 
 
                         # Условие, чтобы шар был спереди
@@ -158,7 +159,7 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
                                 stop_movement()
                                 canvas.delete(ball)
                                 changing_chain(kol)
-                                resume_movement(canvas, chain_balls, moving_points, colors, speeds, cou_balls, points, root, init_app_two)
+                                resume_movement(canvas, chain_balls, moving_points, colors, speeds, points, root, init_app_two)
                                 kol += 1
 #############################################################
                         index_kol = kol
@@ -263,7 +264,7 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
                                     time.sleep(0.01)
 
 
-                                resume_movement(canvas, chain_balls, moving_points, colors, speeds, cou_balls, points, root, init_app_two)
+                                resume_movement(canvas, chain_balls, moving_points, colors, speeds, points, root, init_app_two)
 
                             if index == 1:
                                 stop_movement()
@@ -276,7 +277,7 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
 
                                         zamena += 1
 
-                                resume_movement(canvas, chain_balls, moving_points, colors, speeds, cou_balls, points, root,init_app_two)
+                                resume_movement(canvas, chain_balls, moving_points, colors, speeds, points, root,init_app_two)
                                 print(chain_balls)
 
     ########################################################################################################################
@@ -284,11 +285,15 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
     ######################################################## REPLAY ########################################################
                         # Если первое удаление шаров было, то идет повторная проверка до тех пор, пока не перестанут попадаться такие комбинации шаров с одинаковыми цветами
                         combo_update = combo
+                        print(chain_balls)
+                        print(combo, combo_update, dele)
                         while combo == combo_update:
-                            if combo != 0 and dele[-1] < len(chain_balls):
+                            if combo != 0 and dele[-1] <= len(chain_balls):
                                 index_kol = dele[-1]
                                 kol = index_kol
                                 dele = [index_kol]
+
+                                print(chain_balls[index_kol - 1],chain_balls[index_kol - 2])
 
                                 if chain_balls[index_kol - 1][2] == chain_balls[index_kol - 2][2]:
                                     while index_kol >= 2 and chain_balls[index_kol - 1][2] == chain_balls[index_kol - 2][2]:
@@ -302,6 +307,7 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
 
                                 kol_dele = len(dele)
                                 dele.sort(reverse=True)
+                                print(dele, kol_dele)
 
                                 if kol_dele >= 3:
                                     for excess in range(0, len(dele)):
@@ -329,7 +335,7 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
                                             canvas.update()
                                             time.sleep(0.01)
 
-                                        resume_movement(canvas, chain_balls, moving_points, colors, speeds, cou_balls, points, root, init_app_two)
+                                        resume_movement(canvas, chain_balls, moving_points, colors, speeds, points, root, init_app_two)
 
                                     if index == 1:
                                         stop_movement()
@@ -342,16 +348,17 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
 
                                                 zamena += 1
 
-                                        resume_movement(canvas, chain_balls, moving_points, colors, speeds, cou_balls, points, root, init_app_two)
+                                        resume_movement(canvas, chain_balls, moving_points, colors, speeds, points, root, init_app_two)
 
                             # Прекращает цикл, когда новых комбинаций не появляется
                             if combo_update != combo:
                                 combo += 1
                             else:
-                                canvas.bind("<Button-1>",lambda event: click_event(event, canvas, chain_balls, preview_ball, second_ball, colors, speeds, moving_points, cou_balls, label, points, filename, current_value, initial_value, line, root, init_app_two))
+                                canvas.bind("<Button-1>",lambda event: click_event(event, canvas, chain_balls, preview_ball, second_ball, colors, speeds, moving_points, label, points, filename, current_value, initial_value, line, root, init_app_two))
                                 return
 
-                        canvas.bind("<Button-1>",lambda event: click_event(event, canvas, chain_balls, preview_ball, second_ball,  colors, speeds, moving_points, cou_balls, label, points, filename, current_value, initial_value, line, root,  init_app_two))
+                        canvas.bind("<Button-1>",lambda event: click_event(event, canvas, chain_balls, preview_ball, second_ball,  colors, speeds, moving_points, label, points, filename, current_value, initial_value, line, root,  init_app_two))
+                        print(chain_balls)
                         return
 
     ########################################################################################################################
@@ -362,17 +369,17 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
             else:
                 # Удаляет летящий шар, когда он достигает конца окна
                 canvas.delete(ball)
-                canvas.bind("<Button-1>",lambda event: click_event(event, canvas, chain_balls, preview_ball, second_ball, colors, speeds, moving_points, cou_balls, label, points, filename, current_value, initial_value, line, root, init_app_two))
+                canvas.bind("<Button-1>",lambda event: click_event(event, canvas, chain_balls, preview_ball, second_ball, colors, speeds, moving_points, label, points, filename, current_value, initial_value, line, root, init_app_two))
 
 
 
     move_step(0)
 
-def click_event(event,canvas, chain_balls, preview_ball, second_ball, colors, speeds, moving_points, cou_balls, label, points, filename, current_value, initial_value, line, root, init_app_two):
+def click_event(event,canvas, chain_balls, preview_ball, second_ball, colors, speeds, moving_points, label, points, filename, current_value, initial_value, line, root, init_app_two):
     canvas.unbind("<Button-1>")
     c_ball = canvas.itemcget(preview_ball, 'fill')
     ball = create_ball(canvas, 915, 510, c_ball)  # Создаем шар в центре экрана
-    move_towards_point(canvas, ball, event.x, event.y, chain_balls, c_ball, speeds, colors, moving_points, cou_balls, label, points, filename, current_value, initial_value, line, root, init_app_two, preview_ball, second_ball)
+    move_towards_point(canvas, ball, event.x, event.y, chain_balls, c_ball, speeds, colors, moving_points, label, points, filename, current_value, initial_value, line, root, init_app_two, preview_ball, second_ball)
     update_preview_color(canvas, preview_ball, second_ball, colors)
 ########################################################################################################################
 
@@ -401,37 +408,28 @@ def color_replacement(event, canvas, preview_ball, second_ball):
 
 
 ############################ TURNING THE TOWER #################################
-def init_rotating_shape(canvas, shape, center_x, center_y):
-    angle = 0
-    canvas_shape = None
+def rotate_image(image, angle):
+    # Поворачивает изображение на заданный угол
+    return image.rotate(angle, resample=Image.BICUBIC, expand=True)
 
-    def draw():
-        nonlocal canvas_shape
-        if canvas_shape:
-            canvas.delete(canvas_shape)
+def update_image(event, canvas, image, image_id, photo):
+    # Обновляет изображение, поворачивая его в сторону курсора
+    # Координаты центра изображения
+    center_x = canvas.winfo_width() // 2
+    center_y = canvas.winfo_height() // 2
 
-        rotated_shape = rotate_polygon(shape, angle)
-        canvas_shape = canvas.create_polygon(rotated_shape, fill="blue", outline="black")
+    # Координаты мыши
+    mouse_x, mouse_y = event.x, event.y
 
-    def rotate_polygon(polygon, angle):
-        cx = center_x
-        cy = center_y
-        rotated_points = []
-        for x, y in polygon:
-            x -= cx
-            y -= cy
-            new_x = x * math.cos(math.radians(angle)) - y * math.sin(math.radians(angle))
-            new_y = x * math.sin(math.radians(angle)) + y * math.cos(math.radians(angle))
-            rotated_points.append((new_x + cx, new_y + cy))
-        return rotated_points
+    # Вычисление угла поворота в сторону курсора
+    angle = math.degrees(math.atan2(mouse_y - center_y, mouse_x - center_x))
 
-    def update_angle(event):
-            nonlocal angle
-            x, y = event.x, event.y
-            angle = math.degrees(math.atan2(y - center_y, x - center_x))
-            draw()
-
-    return draw, update_angle
+    # Поворот изображения и его обновление
+    rotated_img = rotate_image(image, (-angle - 90))
+    rotated_photo = ImageTk.PhotoImage(rotated_img)
+    canvas.itemconfig(image_id, image=rotated_photo)
+    canvas.image = photo
+    canvas.image = rotated_photo  # Сохранение ссылки на изображение
 #################################################################################
 
 ####################################################### END ############################################################
@@ -480,9 +478,6 @@ def calculation(speeds, moving_points):
 
 # Создает шар в цепочке и добавляет его в начало списка
 def init_chain(canvas, chain_balls, colors, spawn):
-    # if len(chain_balls) == cou_balls:
-    #     return
-    # else:
     spawn_x = spawn[0][0] # Начальные координаты шара
     spawn_y = spawn[0][1]
     color = random.choice(colors)
@@ -495,13 +490,12 @@ def init_chain(canvas, chain_balls, colors, spawn):
             list_index = list(chain_balls[a])
             list_index[4] += 1
             chain_balls[a] = tuple(list_index)
-    # print(chain_balls)
 
 # Передвижение цепочки шаров и изменение их координат
 distant = 0
 is_moving = True
 chek = 1
-def move_balls(canvas, chain_balls, moving_points, colors, speeds, cou_balls, points, root, init_app_two):
+def move_balls(canvas, chain_balls, moving_points, colors, speeds, points, root, init_app_two):
     global distant, is_moving
     if not is_moving:
         return
@@ -556,16 +550,16 @@ def move_balls(canvas, chain_balls, moving_points, colors, speeds, cou_balls, po
                 end(canvas, points, root, init_app_two)
                 return move_balls
 
-    canvas.after(40, lambda: move_balls(canvas, chain_balls, moving_points, colors, speeds, cou_balls, points, root, init_app_two))
+    canvas.after(40, lambda: move_balls(canvas, chain_balls, moving_points, colors, speeds, points, root, init_app_two))
 
 def stop_movement():
     global is_moving
     is_moving = False
 
-def resume_movement(canvas, chain_balls, moving_points, colors, speeds, cou_balls, points, root, init_app_two):
+def resume_movement(canvas, chain_balls, moving_points, colors, speeds, points, root, init_app_two):
     global is_moving
     is_moving = True
-    move_balls(canvas, chain_balls, moving_points, colors, speeds, cou_balls, points, root, init_app_two)
+    move_balls(canvas, chain_balls, moving_points, colors, speeds, points, root, init_app_two)
 
 ########################################################################################################################
 # Функция для изменения шкалы прогресса
@@ -646,6 +640,16 @@ def init_app(root, init_app_two):
 
     btn_font = font.Font(family='Times new Roman', size=20)
 
+    # Загрузка изображения с использованием Pillow
+    image_path = "Images/Map.png"  # Замените на путь к вашему изображению
+    image = Image.open(image_path)
+    photo_3 = ImageTk.PhotoImage(image)
+
+    # Вставка изображения в Canvas
+    canvas.create_image(960, 540, image=photo_3)
+
+    # Сохранение ссылки на изображение, чтобы оно не было удалено сборщиком мусора
+    canvas.image = photo_3
 #################################################### PANEL #############################################################
     filename = 'Data/points.txt'
     points = [read_points_from_file(filename)]
@@ -670,7 +674,7 @@ def init_app(root, init_app_two):
         if locked:
             clean_ball = False
             enable_events()
-            resume_movement(canvas, chain_balls, moving_points, colors, speeds, cou_balls, points, root, init_app_two)
+            resume_movement(canvas, chain_balls, moving_points, colors, speeds, points, root, init_app_two)
             canvas.delete(pau)
             label_2.pack_forget()
             but_end.destroy()
@@ -702,19 +706,22 @@ def init_app(root, init_app_two):
     # Список из которого будут рандомно выбираться цвета для шаров
     colors = ["red", "blue", "yellow", "green", "orange"]
 
-    # Пример многоугольника (прямугольника)
-    shape = [(890, 460), (940, 460), (940, 560), (890, 560)]
-    center_x = 915
-    center_y = 510
-    draw, update_angle = init_rotating_shape(canvas, shape, center_x, center_y)
+    # Загрузка изображения
+    image = Image.open("Images/duck.png")
+    resized_image = image.resize((image.width // 2, image.height // 2)) # Изменяем его размер
+    photo = ImageTk.PhotoImage(resized_image)
 
-    cou_balls = 1000 # Кол-во шаров
+    # Вставка изображения по центру
+    image_id = canvas.create_image(940, 535, image=photo)
+
+
+
     chain_balls = []
-    moving_points = [(1920, 500), (1618, 343), (1500, 293), (1336, 254), (1184, 209), (1024, 186), (854, 184), (395, 170), (236, 176), (107, 203), (28, 277), (28, 415), (59, 561), (102, 617), (160, 666), (244, 681), (330, 680), (411, 656), (480, 613), (541, 545), (652, 451), (755, 375), (834, 358), (938, 359), (1010, 385), (1117, 406), (1189, 509), (1239, 563), (1317, 583), (1398, 596), (1480, 600), (1583, 622), (1719, 679), (1771, 741), (1737, 880), (1661, 931), (962, 807), (818, 830), (723, 853), (641, 903), (586, 970), (570, 1080)]
+    moving_points = [(1920, 500), (1618, 343), (1500, 293), (1336, 254), (1184, 209), (1024, 186), (854, 184), (395, 170), (236, 176), (107, 203), (28, 277), (28, 415), (59, 561), (102, 617), (160, 666), (244, 681), (330, 680), (411, 656), (480, 613), (541, 545), (652, 451), (755, 375), (834, 358), (938, 359), (1010, 385), (1117, 406), (1189, 509), (1239, 563), (1317, 583), (1398, 596), (1480, 600), (1562, 666), (1601, 759), (1479, 812), (962, 807), (818, 830), (723, 853), (641, 903), (586, 970), (570, 1080)]
     speeds = []
     init_chain(canvas, chain_balls, colors, moving_points) # Создание цепочки шаров
     calculation(speeds, moving_points) # Высчитываем направление шаров в каждой зоны
-    move_balls(canvas, chain_balls, moving_points, colors, speeds, cou_balls, points, root, init_app_two) # Запуск анимации шаров
+    move_balls(canvas, chain_balls, moving_points, colors, speeds, points, root, init_app_two) # Запуск анимации шаров
 
 
     # Создаем шары для предварительного просмотра цвета`
@@ -725,9 +732,9 @@ def init_app(root, init_app_two):
     update_preview_color(canvas, preview_ball, second_ball, colors)
 
     def enable_events():
-        canvas.bind("<Motion>", update_angle)
+        canvas.bind("<Motion>", lambda event: update_image(event, canvas, resized_image, image_id, photo_3))
         canvas.bind("<Button-3>", lambda event: color_replacement(event, canvas, preview_ball, second_ball))
-        canvas.bind("<Button-1>", lambda event: click_event(event, canvas, chain_balls, preview_ball, second_ball, colors, speeds, moving_points, cou_balls, label, points, filename, current_value, initial_value, line, root, init_app_two))
+        canvas.bind("<Button-1>", lambda event: click_event(event, canvas, chain_balls, preview_ball, second_ball, colors, speeds, moving_points, label, points, filename, current_value, initial_value, line, root, init_app_two))
 
     def disable_events():
         canvas.unbind("<Motion>")

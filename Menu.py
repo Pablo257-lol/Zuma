@@ -3,13 +3,18 @@ import tkinter as tk
 from tkinter import font
 import Game
 import re
+from PIL import Image, ImageTk
 
 data = "Data/text.txt"
 pack1 = False
 pack2 = False
 pack3 = True
 
+# Начальное изображение на кнопке
+current_image = 1
+
 def button(frame, btn_font, frame1_2, frame3):
+    global current_image
     # Кнопка, для перехода в окно выбора уровней
     btn_1 = Button(frame, font=btn_font, text='Начать игру', command=lambda: data_frame(frame, frame1_2))
     btn_1.place(x= 1000, rely=0.25, height=100, width=500)
@@ -22,7 +27,26 @@ def button(frame, btn_font, frame1_2, frame3):
     btn_3 = Button(frame, font=btn_font, text= "Результаты", command=lambda :farther(frame, frame3, btn_font, frame1_2))
     btn_3.place(x= 1000, rely=0.45, height=100, width=500)
 
-    btn_zv = Button(frame)
+
+    # Загрузка изображений
+    image_path1 = "Images/on.png"  # Замените на путь к первому изображению
+    image_path2 = "Images/off.png"  # Замените на путь ко второму изображению
+
+    image1 = Image.open(image_path1)
+    image2 = Image.open(image_path2)
+
+    razm = 5
+
+    # Изменяем их размеры
+    resized_image1 = image1.resize((image1.width // (razm + 1), image1.height // (razm + 1)))
+    resized_image2 = image2.resize((image2.width // razm, image2.height // razm))
+
+    photo1 = ImageTk.PhotoImage(resized_image1)
+    photo2 = ImageTk.PhotoImage(resized_image2)
+    if current_image == 1:
+        btn_zv = Button(frame, image= photo1, command= lambda: toggle_image(btn_zv, photo1, photo2))
+    else:
+        btn_zv = Button(frame, image=photo2, command=lambda: toggle_image(btn_zv, photo1, photo2))
     btn_zv.place(x= 1810, y= 10, height= 100, width= 100)
 
 # Переходит во frame1_2
@@ -97,7 +121,16 @@ def read_and_sort_lines_by_number(filename):
     sorted_lines = sorted(lines, key=extract_number, reverse=True)
     return [line.strip() for line in sorted_lines]  # Убираем лишние пробелы и символы новой строки
 
-
+def toggle_image(button, photo1, photo2):
+    # Переключение изображения на кнопке при нажатии
+    global current_image
+    # Переключение изображения
+    if current_image == 1:
+        button.config(image=photo2)
+        current_image = 2
+    else:
+        button.config(image=photo1)
+        current_image = 1
 
 def init_app_two(win):
     global pack1
