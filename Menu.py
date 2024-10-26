@@ -4,6 +4,9 @@ from tkinter import font
 import Game
 import re
 from PIL import Image, ImageTk
+import pyaudio
+import wave
+import threading
 
 data = "Data/text.txt"
 pack1 = False
@@ -12,6 +15,8 @@ pack3 = True
 
 # Начальное изображение на кнопке
 current_image = 1
+is_playing = False
+thread = None
 
 def button(frame, btn_font, frame1_2, frame3):
     global current_image
@@ -58,6 +63,9 @@ def data_frame(frame, frame1_2):
         frame.pack_forget()
         Game.init_app(win, init_app_two)
     else:
+        for widget in frame.winfo_children():  # Перебираем все дочерние элементы Canvas
+            if isinstance(widget, tk.Button):  # Проверяем, является ли элемент кнопкой
+                widget.config(state="disabled")  # Блокируем кнопку
         frame1_2.place(relx=0.5, rely=0.5, anchor="center")
         pack1 = True
         return
@@ -128,15 +136,60 @@ def toggle_image(button, photo1, photo2):
     if current_image == 1:
         button.config(image=photo2)
         current_image = 2
+        toggle_music()
     else:
         button.config(image=photo1)
         current_image = 1
+        toggle_music()
+
+
+def play_music():
+    global is_playing
+    # Открываем WAV файл
+    wf = wave.open('Music\Пляжные Волны.wav', 'rb')  # Укажите путь к вашему WAV файлу
+
+    # Инициализация PyAudio
+    p = pyaudio.PyAudio()
+
+    # Открываем поток
+    stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
+                     channels=wf.getnchannels(),
+                     rate=wf.getframerate(),
+                     output=True)
+
+    while is_playing:
+        # Сброс позиции в начало файла
+        wf.rewind()
+        data = wf.readframes(1024)
+        while data and is_playing:
+            stream.write(data)
+            data = wf.readframes(1024)
+
+    # Закрытие потока и PyAudio
+    stream.stop_stream()
+    stream.close()
+    p.terminate()
+    wf.close()
+
+def toggle_music():
+    global is_playing, thread
+    if is_playing:
+        is_playing = False
+        if thread is not None:
+            thread.join()  # Ждем завершения потока
+    else:
+        is_playing = True
+        thread = threading.Thread(target=play_music)
+        thread.start()
+
 
 def init_app_two(win):
     global pack1
     pack1 = False
 
     clean()
+
+    toggle_music() # Запуск музыки
 
     # Image
     win_bg = PhotoImage(file="Images/background_1.png")
@@ -150,11 +203,16 @@ def init_app_two(win):
     bg_logo.pack()
 
     # Frame - Поле ввода информации
-    frame1_2 = Frame(win, width=500, height= 300, bg= "lightblue")
+    frame1_2 = Frame(win, width=500, height= 300, bg= "lightblue", highlightthickness=10, highlightbackground="black")
 
     prov = (frame1_2.register(proverka), '%P')
     entry = Entry(frame1_2, validate="key", validatecommand=prov, font=("Times new Roman", 23))
     entry.place(relx= 0.49, rely= 0.4, height= 50, width= 300, anchor="center")
+
+    label_nad = Label(frame1_2,
+                  text="Введите никнейм",
+                  foreground="black", background="lightblue", font=("Times new Roumen", 30))
+    label_nad.place(relx=0.5, rely=0.15, height=40, width=430, anchor="center")
 
     label = Label(frame1_2,
                       text="Введенное имя должно состоять не менее 4 символов",

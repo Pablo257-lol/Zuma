@@ -15,7 +15,7 @@ clean_ball = False
 def create_ball(canvas, x, y, color):
     return canvas.create_oval(x, y, x+50, y+50, fill=color)
 
-def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball, speeds, colors, moving_points, label, points, filename, current_value, initial_value, line, root, init_app_two, preview_ball, second_ball):
+def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball, speeds, colors, moving_points, label, points, filename, current_value, initial_value, root, init_app_two, preview_ball, second_ball):
     coords = canvas.coords(ball)
     start_x = (coords[0] + coords[2]) / 2
     start_y = (coords[1] + coords[3]) / 2
@@ -247,7 +247,7 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
                                 chain_balls.remove((excess))
                             combo += 1
 
-                            decrease_number(canvas, label, points, filename, current_value, initial_value, line, combo, kol_dele) # Начисление очков
+                            decrease_number(canvas, label, points, filename, current_value, initial_value, combo, kol_dele) # Начисление очков
 
 
                             zamena = 0
@@ -320,7 +320,7 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
                                         chain_balls.remove((excess))
                                     combo_update += 1
 
-                                    decrease_number(canvas, label, points, filename, current_value, initial_value, line, combo_update, kol_dele) # Начисление очков
+                                    decrease_number(canvas, label, points, filename, current_value, initial_value, combo_update, kol_dele) # Начисление очков
 
 
                                     zamena = 0
@@ -354,10 +354,10 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
                             if combo_update != combo:
                                 combo += 1
                             else:
-                                canvas.bind("<Button-1>",lambda event: click_event(event, canvas, chain_balls, preview_ball, second_ball, colors, speeds, moving_points, label, points, filename, current_value, initial_value, line, root, init_app_two))
+                                canvas.bind("<Button-1>",lambda event: click_event(event, canvas, chain_balls, preview_ball, second_ball, colors, speeds, moving_points, label, points, filename, current_value, initial_value, root, init_app_two))
                                 return
 
-                        canvas.bind("<Button-1>",lambda event: click_event(event, canvas, chain_balls, preview_ball, second_ball,  colors, speeds, moving_points, label, points, filename, current_value, initial_value, line, root,  init_app_two))
+                        canvas.bind("<Button-1>",lambda event: click_event(event, canvas, chain_balls, preview_ball, second_ball,  colors, speeds, moving_points, label, points, filename, current_value, initial_value, root,  init_app_two))
                         print(chain_balls)
                         return
 
@@ -369,17 +369,17 @@ def move_towards_point(canvas, ball, target_x, target_y, chain_balls, color_ball
             else:
                 # Удаляет летящий шар, когда он достигает конца окна
                 canvas.delete(ball)
-                canvas.bind("<Button-1>",lambda event: click_event(event, canvas, chain_balls, preview_ball, second_ball, colors, speeds, moving_points, label, points, filename, current_value, initial_value, line, root, init_app_two))
+                canvas.bind("<Button-1>",lambda event: click_event(event, canvas, chain_balls, preview_ball, second_ball, colors, speeds, moving_points, label, points, filename, current_value, initial_value, root, init_app_two))
 
 
 
     move_step(0)
 
-def click_event(event,canvas, chain_balls, preview_ball, second_ball, colors, speeds, moving_points, label, points, filename, current_value, initial_value, line, root, init_app_two):
+def click_event(event,canvas, chain_balls, preview_ball, second_ball, colors, speeds, moving_points, label, points, filename, current_value, initial_value, root, init_app_two):
     canvas.unbind("<Button-1>")
     c_ball = canvas.itemcget(preview_ball, 'fill')
     ball = create_ball(canvas, 915, 510, c_ball)  # Создаем шар в центре экрана
-    move_towards_point(canvas, ball, event.x, event.y, chain_balls, c_ball, speeds, colors, moving_points, label, points, filename, current_value, initial_value, line, root, init_app_two, preview_ball, second_ball)
+    move_towards_point(canvas, ball, event.x, event.y, chain_balls, c_ball, speeds, colors, moving_points, label, points, filename, current_value, initial_value, root, init_app_two, preview_ball, second_ball)
     update_preview_color(canvas, preview_ball, second_ball, colors)
 ########################################################################################################################
 
@@ -660,12 +660,8 @@ def init_app(root, init_app_two):
     initial_value = 1 ##################################################################################################
     current_value = initial_value ######################################################################################
 
-    canvas.create_rectangle((528, 2), (1483, 64), width= 5, fill= 'yellow')
-    canvas.create_rectangle((618, 19), (1409, 49), width=5)
-    line = canvas.create_line(618, 34, 1409, 34, fill="cyan2", width=30)
-
     label = tk.Label(canvas, text=str(points[0]), background="#FFFF00", fg='black', borderwidth=5,font=("Arial", 30), relief='solid')
-    label.place(x=0, y=0, width=532, height=67)
+    label.place(x=0, y=0, width=960, height=67)
 
     def locked_or_unlocked(): # Создание окна паузы
         global locked, clean_ball
@@ -700,7 +696,7 @@ def init_app(root, init_app_two):
     but_continue = tk.Button(canvas, text='Возобновить', font=btn_font, command=locked_or_unlocked)
 
     pause_but = tk.Button(canvas, text= 'Приостановить', font= btn_font, bg= "#FFFF00", fg= 'black', borderwidth= 10, command= locked_or_unlocked)
-    pause_but.place(x= 1486, width= 444, height= 67)
+    pause_but.place(x= 960, width= 960, height= 67)
 
 #######################################################################################################################
     # Список из которого будут рандомно выбираться цвета для шаров
@@ -734,7 +730,7 @@ def init_app(root, init_app_two):
     def enable_events():
         canvas.bind("<Motion>", lambda event: update_image(event, canvas, resized_image, image_id, photo_3))
         canvas.bind("<Button-3>", lambda event: color_replacement(event, canvas, preview_ball, second_ball))
-        canvas.bind("<Button-1>", lambda event: click_event(event, canvas, chain_balls, preview_ball, second_ball, colors, speeds, moving_points, label, points, filename, current_value, initial_value, line, root, init_app_two))
+        canvas.bind("<Button-1>", lambda event: click_event(event, canvas, chain_balls, preview_ball, second_ball, colors, speeds, moving_points, label, points, filename, current_value, initial_value, root, init_app_two))
 
     def disable_events():
         canvas.unbind("<Motion>")
